@@ -11,10 +11,36 @@ namespace CallOds.Controllers
     {
         // GET: api/<CallOdsController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            Process.Start(@"D:\ASP\LibreOffice\LibreOffice\bin\Debug\LibreOffice.exe");
-            return new string[] { "ODS Save!" };
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = @"D:\ASP\LibreOffice\LibreOffice\bin\Debug\LibreOffice.exe",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+            process.Start();
+            process.WaitForExit();
+            
+            // 檢查檔案是否存在
+            var filePath = @"C:\file\file.ods";
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("檔案未找到");
+            }
+
+            // 讀取檔案並回傳
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            var response = new FileContentResult(fileBytes, "application/vnd.oasis.opendocument.spreadsheet")
+            {
+                FileDownloadName = "file.ods"
+            };
+
+            return response;
         }
 
         // GET api/<CallOdsController>/5
@@ -26,7 +52,7 @@ namespace CallOds.Controllers
 
         // POST api/<CallOdsController>
         [HttpPost]
-        public ActionResult<string> Post([FromBody] string value)
+        public IActionResult Post([FromBody] string value)
         {
             
             var process = new System.Diagnostics.Process
