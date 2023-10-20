@@ -43,7 +43,21 @@ namespace CallOds.Controllers
             process.Start();
             process.WaitForExit();
 
-            return "Application Started with parameter: " + value;
+            // 檢查檔案是否存在
+            var filePath = @"C:\file\file.ods";
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("檔案未找到");
+            }
+
+            // 讀取檔案並回傳
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            var response = new FileContentResult(fileBytes, "application/vnd.oasis.opendocument.spreadsheet")
+            {
+                FileDownloadName = "file.ods"
+            };
+
+            return response;
         }
 
         // PUT api/<CallOdsController>/5
