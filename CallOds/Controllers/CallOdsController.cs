@@ -14,7 +14,7 @@ namespace CallOds.Controllers
         public IEnumerable<string> Get()
         {
             Process.Start(@"D:\ASP\LibreOffice\LibreOffice\bin\Debug\LibreOffice.exe");
-            return new string[] { "value1", "value2" };
+            return new string[] { "ODS Save!" };
         }
 
         // GET api/<CallOdsController>/5
@@ -26,8 +26,24 @@ namespace CallOds.Controllers
 
         // POST api/<CallOdsController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ActionResult<string> Post([FromBody] string value)
         {
+            
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = @"D:\ASP\LibreOffice\LibreOffice\bin\Debug\LibreOffice.exe",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    Arguments = "\"" + value + "\"",
+                }
+            };
+            process.Start();
+            process.WaitForExit();
+
+            return "Application Started with parameter: " + value;
         }
 
         // PUT api/<CallOdsController>/5
